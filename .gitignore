@@ -1,0 +1,29 @@
+# Build outputs
+*.img
+*.raw
+*.qcow2
+*.iso
+
+# Temporary build directories
+output/
+.local-storage/
+
+# Log files
+*.log
+build.log
+
+# Container images
+*.tar
+*.oci
+
+# Editor and IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
