@@ -1,208 +1,208 @@
 # Fedora IoT bootc Image Builder for Raspberry Pi 4
 
-Tento projekt umožňuje vytvořit bootable Fedora IoT image pro Raspberry Pi 4 pomocí bootc technologie a containerů.
+This project enables you to create a bootable Fedora IoT image for Raspberry Pi 4 using bootc technology and containers.
 
-## ✨ Vlastnosti
+## ✨ Features
 
-- 🔧 **Automatizovaný build proces** - Jeden příkaz pro vytvoření celého image
-- 🐳 **Containerizovaný přístup** - Využití Podman pro reprodukovatelné buildy
-- 🔐 **SSH přístup** - Automatické vložení SSH klíče pro bezpečný vzdálený přístup
-- 🌐 **NetworkManager** - Plná podpora síťových konfigurací
-- 🎯 **Optimalizováno pro RPi4** - Správné firmware, bootloader a kernel
+- 🔧 **Automated build process** - Single command to create the entire image
+- 🐳 **Containerized approach** - Uses Podman for reproducible builds
+- 🔐 **SSH access** - Automatic SSH key injection for secure remote access
+- 🌐 **NetworkManager** - Full network configuration support
+- 🎯 **Optimized for RPi4** - Proper firmware, bootloader, and kernel
 
-## 📋 Požadavky
+## 📋 Requirements
 
-- Fedora Linux (doporučeno Fedora 40+)
+- Fedora Linux (recommended Fedora 40+)
 - Podman
-- Root přístup (sudo)
-- Základní nástroje: `parted`, `rsync`, `losetup`, `mkfs.vfat`, `mkfs.ext4`
+- Root access (sudo)
+- Basic tools: `parted`, `rsync`, `losetup`, `mkfs.vfat`, `mkfs.ext4`
 
-Instalace požadavků:
+Install requirements:
 
 ```bash
 sudo dnf install -y podman parted rsync dosfstools e2fsprogs
 ```
 
-## 🚀 Rychlý start
+## 🚀 Quick Start
 
-### 1. Stažení projektu
+### 1. Clone the project
 
 ```bash
 git clone https://github.com/your-username/rpi-bootc-fedoraiot.git
 cd rpi-bootc-fedoraiot
 ```
 
-### 2. Build image
+### 2. Build the image
 
 ```bash
 sudo ./build.sh
 ```
 
-Skript automaticky:
-1. Detekuje váš SSH klíč (`~/.ssh/id_ed25519.pub` nebo `~/.ssh/id_rsa.pub`)
-2. Vytvoří bootc container s Fedora IoT pro ARM64
-3. Exportuje filesystem z containeru
-4. Vytvoří 10GB bootable disk image s GPT partition table
-5. Zkopíruje všechny soubory a nainstaluje bootloader
-6. Vygeneruje `fedora-iot-rpi4-bootc.img` připravený k zápisu
+The script automatically:
+1. Detects your SSH key (`~/.ssh/id_ed25519.pub` or `~/.ssh/id_rsa.pub`)
+2. Creates a bootc container with Fedora IoT for ARM64
+3. Exports the filesystem from the container
+4. Creates a 10GB bootable disk image with GPT partition table
+5. Copies all files and installs the bootloader
+6. Generates `fedora-iot-rpi4-bootc.img` ready to write
 
-### 3. Zápis na SD kartu
+### 3. Write to SD card
 
-Zjistěte název zařízení SD karty:
+Identify your SD card device name:
 
 ```bash
 lsblk
 ```
 
-Zapište image na SD kartu (nahraďte `/dev/sdX` skutečným zařízením):
+Write the image to the SD card (replace `/dev/sdX` with actual device):
 
 ```bash
 sudo dd if=fedora-iot-rpi4-bootc.img of=/dev/sdX bs=4M status=progress && sync
 ```
 
-⚠️ **POZOR:** Ujistěte se, že píšete na správné zařízení! Tímto příkazem přepíšete veškerá data na cílovém disku.
+⚠️ **WARNING:** Make sure you're writing to the correct device! This command will overwrite all data on the target disk.
 
 ### 4. Boot Raspberry Pi
 
-1. Vložte SD kartu do Raspberry Pi 4
-2. Připojte napájení
-3. RPi4 bootne z SD karty
+1. Insert the SD card into Raspberry Pi 4
+2. Connect power
+3. RPi4 will boot from the SD card
 
-## 🔐 SSH Přístup
+## 🔐 SSH Access
 
-Po spuštění se můžete připojit pomocí SSH:
+After boot, you can connect via SSH:
 
 ```bash
 ssh fedora@<IP_ADDRESS>
 ```
 
-nebo
+or
 
 ```bash
 ssh root@<IP_ADDRESS>
 ```
 
-Váš SSH klíč je automaticky nakonfigurován pro oba uživatele.
+Your SSH key is automatically configured for both users.
 
-## 📁 Struktura projektu
+## 📁 Project Structure
 
 ```
 .
-├── Containerfile          # Definice bootc container image
-├── build.sh              # Hlavní build skript
-└── README.md             # Tato dokumentace
+├── Containerfile          # bootc container image definition
+├── build.sh              # Main build script
+└── README.md             # This documentation
 ```
 
-## 🔧 Jak to funguje
+## 🔧 How It Works
 
 ### 1. Containerfile
 
-Definuje Fedora IoT bootc image:
+Defines the Fedora IoT bootc image:
 - Base image: `quay.io/fedora/fedora-bootc:41`
-- Instaluje RPi4 firmware a kernel
-- Konfiguruje NetworkManager
-- Přidává SSH klíče
-- Nastavuje udev pravidla pro boot
+- Installs RPi4 firmware and kernel
+- Configures NetworkManager
+- Adds SSH keys
+- Sets up udev rules for boot
 
-### 2. Build skript
+### 2. Build script
 
-`build.sh` provádí následující kroky:
+`build.sh` performs the following steps:
 
-1. **Detekce SSH klíče** - Automaticky nalezne váš veřejný SSH klíč
-2. **Container build** - Vytvoří ARM64 bootc container pomocí `podman build --arch aarch64`
-3. **Export filesystem** - Exportuje obsah containeru
-4. **Vytvoření disk image**:
-   - Vytvoří 10GB soubor pomocí `dd`
-   - Vytvoří GPT partition table s EFI a root partitions
-   - Naformátuje partitions (FAT32 pro EFI, ext4 pro root)
-5. **Kopírování dat** - Použije `rsync` pro zkopírování filesystemu
-6. **Instalace bootloaderu** - Zkopíruje RPi4 firmware a U-Boot
-7. **Cleanup** - Odmountuje a uklidí dočasné soubory
+1. **SSH key detection** - Automatically finds your public SSH key
+2. **Container build** - Creates ARM64 bootc container using `podman build --arch aarch64`
+3. **Filesystem export** - Exports container contents
+4. **Disk image creation**:
+   - Creates 10GB file using `dd`
+   - Creates GPT partition table with EFI and root partitions
+   - Formats partitions (FAT32 for EFI, ext4 for root)
+5. **Data copy** - Uses `rsync` to copy the filesystem
+6. **Bootloader installation** - Copies RPi4 firmware and U-Boot
+7. **Cleanup** - Unmounts and cleans up temporary files
 
-## ⚙️ Pokročilá konfigurace
+## ⚙️ Advanced Configuration
 
-### Vlastní SSH klíč
+### Custom SSH key
 
-Můžete zadat vlastní SSH klíč jako parametr:
+You can specify a custom SSH key as a parameter:
 
 ```bash
 sudo ./build.sh "ssh-ed25519 AAAA..."
 ```
 
-### Modifikace Containerfile
+### Modify Containerfile
 
-Pro přidání dalšího software upravte `Containerfile`:
+To add additional software, edit the `Containerfile`:
 
 ```dockerfile
 RUN dnf install -y vim htop
 ```
 
-### Změna velikosti image
+### Change image size
 
-Upravte v `build.sh` řádek:
+Edit the line in `build.sh`:
 
 ```bash
 dd if=/dev/zero of=${OUTPUT_IMAGE} bs=1M count=10240 status=progress
 ```
 
-Změňte `count=10240` (10GB) na požadovanou velikost v MB.
+Change `count=10240` (10GB) to your desired size in MB.
 
 ## 🐛 Troubleshooting
 
-### Chyba: "Container neexistuje"
+### Error: "Container does not exist"
 
-Build nejprve vytvoří container automaticky. Pokud chcete rebuild:
+The build creates the container automatically. For rebuild:
 
 ```bash
 sudo podman rmi localhost/fedora-iot-rpi4:latest
 sudo ./build.sh
 ```
 
-### Chyba: "Permission denied" při zápisu na SD kartu
+### Error: "Permission denied" when writing to SD card
 
-Ujistěte se, že používáte správné zařízení a máte root přístup:
+Make sure you're using the correct device and have root access:
 
 ```bash
 sudo dd if=fedora-iot-rpi4-bootc.img of=/dev/sdX bs=4M status=progress && sync
 ```
 
-### RPi4 nebootu
+### RPi4 doesn't boot
 
-1. Zkontrolujte, že máte správný model (RPi 4 nebo 400)
-2. Ujistěte se, že SD karta je správně zformátována
-3. Zkuste rebuild image: `sudo ./build.sh`
+1. Check that you have the correct model (RPi 4 or 400)
+2. Ensure the SD card is properly formatted
+3. Try rebuilding the image: `sudo ./build.sh`
 
-### SSH klíč není přijímán
+### SSH key not accepted
 
-Ověřte, že klíč byl správně vložen:
+Verify the key was properly injected:
 
 ```bash
-# Pokud image ještě není zapsán:
+# If image is not written yet:
 sudo podman run --rm localhost/fedora-iot-rpi4:latest cat /root/.ssh/authorized_keys
 ```
 
-## 📚 Další zdroje
+## 📚 Additional Resources
 
 - [Fedora IoT Documentation](https://docs.fedoraproject.org/en-US/iot/)
 - [bootc Project](https://github.com/containers/bootc)
 - [Raspberry Pi 4 Documentation](https://www.raspberrypi.com/documentation/computers/raspberry-pi.html)
 
-## 📝 Poznámky
+## 📝 Notes
 
-- Image je optimalizován pro Raspberry Pi 4 (Model B i 400)
-- Výchozí velikost image je 10GB
-- Používá se U-Boot jako bootloader
-- Podporuje EFI boot
-- NetworkManager je aktivní pro snadnou konfiguraci sítě
+- Image is optimized for Raspberry Pi 4 (Model B and 400)
+- Default image size is 10GB
+- Uses U-Boot as bootloader
+- Supports EFI boot
+- NetworkManager is active for easy network configuration
 
-## 🤝 Přispívání
+## 🤝 Contributing
 
-Příspěvky jsou vítány! Vytvořte issue nebo pull request.
+Contributions are welcome! Create an issue or pull request.
 
-## 📄 Licence
+## 📄 License
 
-MIT License - můžete volně používat, modifikovat a distribuovat.
+MIT License - free to use, modify, and distribute.
 
 ---
 
-Vytvořeno s ❤️ pro Fedora IoT a Raspberry Pi komunitu
+Created with ❤️ for Fedora IoT and Raspberry Pi community
