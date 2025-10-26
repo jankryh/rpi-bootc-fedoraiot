@@ -12,26 +12,32 @@ This project enables you to create a bootable Fedora IoT image for Raspberry Pi 
 
 ## 📋 Requirements
 
-- Fedora Linux (recommended Fedora 40+) or macOS (Apple Silicon, M1–M4)
+- **Fedora Linux** (recommended Fedora 40+) for full image building
+- **macOS** (Apple Silicon M1–M4) for container building only
 - Podman
 - On Linux: root access (sudo) and basic tools `parted`, `rsync`, `losetup`, `mkfs.vfat`, `mkfs.ext4`
 
-Install on Fedora Linux:
+### Install on Fedora Linux:
 
 ```bash
 sudo dnf install -y podman parted rsync dosfstools e2fsprogs
 ```
 
-Install on macOS:
+### Install on macOS:
 
 ```bash
 brew install podman
-podman machine init --cpus 4 --memory 4096 --disk-size 20
+podman machine init --cpus 8 --memory 8192 --disk-size 100
 podman machine start
 ```
-Notes for macOS:
-- The script detects macOS and runs Linux-only steps inside a privileged Fedora container.
-- No sudo is required on macOS; everything executes in containers.
+
+**Note for macOS users:** 
+- macOS can build the ARM64 bootc container image
+- **Disk image creation requires Linux** due to loop device limitations
+- Options for macOS users:
+  1. Build container on macOS, then create disk image on a Linux machine (VM, cloud, etc.)
+  2. Use the `rootfs.tar` export and create the image manually on Linux
+  3. Use a Linux VM (UTM, Parallels, VMware Fusion) with the full script
 
 ## 🚀 Quick Start
 

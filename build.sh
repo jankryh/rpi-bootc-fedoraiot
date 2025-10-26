@@ -52,7 +52,7 @@ podman build --arch aarch64 \
 echo "✅ Container created: ${CONTAINER_TAG}"
 
 # ------------------------------------------------------------
-# 💾 2. Export root filesystem from container
+# 💾 2. Export root filesystem from container  
 # ------------------------------------------------------------
 echo "📤 Exporting container filesystem..."
 podman export $(podman create ${CONTAINER_TAG}) -o rootfs.tar
@@ -63,58 +63,20 @@ echo "✅ Filesystem exported to: $(pwd)/rootfs.tar"
 # ------------------------------------------------------------
 OS=$(uname -s)
 if [ "$OS" = "Darwin" ]; then
-  echo "🖥️  Detected macOS. Running Linux image creation inside a privileged Fedora container..."
-  podman run --rm --privileged \
-    -v "$(pwd)":/work -w /work \
-    quay.io/fedora/fedora:41 bash -lc '
-set -euo pipefail
-dnf -y install parted e2fsprogs dosfstools util-linux rsync > /dev/null
-TEMP_DIR=$(mktemp -d)
-tar -xf rootfs.tar -C ${TEMP_DIR}
-IMAGE_NAME="'"${IMAGE_NAME}"'"
-OUTPUT_IMAGE="'"${OUTPUT_IMAGE}"'"
-echo "💾 Creating disk image (10GB)..."
-dd if=/dev/zero of=${OUTPUT_IMAGE} bs=1M count=10240 status=progress
-echo "📊 Creating partition table..."
-parted -s ${OUTPUT_IMAGE} mklabel gpt
-parted -s ${OUTPUT_IMAGE} mkpart primary fat32 1MiB 513MiB
-parted -s ${OUTPUT_IMAGE} set 1 esp on
-parted -s ${OUTPUT_IMAGE} mkpart primary ext4 513MiB 100%
-echo "🔗 Setting up loop device..."
-LOOP_DEV=$(losetup -fP --show ${OUTPUT_IMAGE})
-echo "Loop device: ${LOOP_DEV}"
-echo "💿 Formatting partitions..."
-mkfs.vfat -F32 ${LOOP_DEV}p1
-mkfs.ext4 -F ${LOOP_DEV}p2
-MOUNT_DIR=$(mktemp -d)
-mount ${LOOP_DEV}p2 ${MOUNT_DIR}
-mkdir -p ${MOUNT_DIR}/boot/efi
-mount ${LOOP_DEV}p1 ${MOUNT_DIR}/boot/efi
-echo "📋 Copying filesystem..."
-rsync -aHA --no-xattrs ${TEMP_DIR}/ ${MOUNT_DIR}/ || true
-echo "🥾 Installing bootloader..."
-mkdir -p ${MOUNT_DIR}/boot/efi/EFI/BOOT
-if [ -d ${MOUNT_DIR}/usr/share/uboot/rpi_arm64 ]; then
-  cp ${MOUNT_DIR}/usr/share/uboot/rpi_arm64/u-boot.bin ${MOUNT_DIR}/boot/efi/
+  echo ""
+  echo "⚠️  macOS detected: Disk image creation requires Linux."
+  echo ""
+  echo "Options:"
+  echo "  1. Transfer rootfs.tar to a Linux machine and run the script there"
+  echo "  2. Use a Linux VM (UTM, Parallels, VMware Fusion)"  
+  echo "  3. Use cloud Linux instance (AWS, GCP, Azure)"
+  echo ""
+  echo "✅ Container image built: ${CONTAINER_TAG}"
+  echo "✅ Filesystem exported: rootfs.tar"
+  echo ""
+  echo "On Linux, run: sudo ./build.sh"
+  exit 0
 fi
-if [ -d ${MOUNT_DIR}/usr/share/bcm283x-firmware ]; then
-  cp -r ${MOUNT_DIR}/usr/share/bcm283x-firmware/* ${MOUNT_DIR}/boot/efi/
-fi
-cat > ${MOUNT_DIR}/boot/efi/config.txt << EOF
-enable_uart=1
-dtoverlay=vc4-kms-v3d
-gpu_mem=128
-arm_64bit=1
-kernel=u-boot.bin
-EOF
-echo "🧹 Cleanup..."
-sync
-umount ${MOUNT_DIR}/boot/efi
-umount ${MOUNT_DIR}
-losetup -d ${LOOP_DEV}
-rm -rf ${TEMP_DIR} ${MOUNT_DIR}
-'
-else
   # Linux host path (uses local tools)
   # Create empty disk image (10GB)
   echo "💾 Creating disk image (10GB)..."
