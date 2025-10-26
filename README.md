@@ -12,16 +12,26 @@ This project enables you to create a bootable Fedora IoT image for Raspberry Pi 
 
 ## 📋 Requirements
 
-- Fedora Linux (recommended Fedora 40+)
+- Fedora Linux (recommended Fedora 40+) or macOS (Apple Silicon, M1–M4)
 - Podman
-- Root access (sudo)
-- Basic tools: `parted`, `rsync`, `losetup`, `mkfs.vfat`, `mkfs.ext4`
+- On Linux: root access (sudo) and basic tools `parted`, `rsync`, `losetup`, `mkfs.vfat`, `mkfs.ext4`
 
-Install requirements:
+Install on Fedora Linux:
 
 ```bash
 sudo dnf install -y podman parted rsync dosfstools e2fsprogs
 ```
+
+Install on macOS:
+
+```bash
+brew install podman
+podman machine init --cpus 4 --memory 4096 --disk-size 20
+podman machine start
+```
+Notes for macOS:
+- The script detects macOS and runs Linux-only steps inside a privileged Fedora container.
+- No sudo is required on macOS; everything executes in containers.
 
 ## 🚀 Quick Start
 
@@ -34,8 +44,16 @@ cd rpi-bootc-fedoraiot
 
 ### 2. Build the image
 
+On Fedora Linux:
+
 ```bash
 sudo ./build.sh
+```
+
+On macOS (M1–M4):
+
+```bash
+./build.sh
 ```
 
 The script automatically:
@@ -54,10 +72,20 @@ Identify your SD card device name:
 lsblk
 ```
 
-Write the image to the SD card (replace `/dev/sdX` with actual device):
+Write the image to the SD card (replace device accordingly):
+
+- Linux:
 
 ```bash
 sudo dd if=fedora-iot-rpi4-bootc.img of=/dev/sdX bs=4M status=progress && sync
+```
+
+- macOS (find device with `diskutil list`, then use `rdiskN` for speed):
+
+```bash
+diskutil list
+sudo diskutil unmountDisk /dev/diskN
+sudo dd if=fedora-iot-rpi4-bootc.img of=/dev/rdiskN bs=4m && sync
 ```
 
 ⚠️ **WARNING:** Make sure you're writing to the correct device! This command will overwrite all data on the target disk.
@@ -177,8 +205,8 @@ sudo dd if=fedora-iot-rpi4-bootc.img of=/dev/sdX bs=4M status=progress && sync
 Verify the key was properly injected:
 
 ```bash
-# If image is not written yet:
-sudo podman run --rm localhost/fedora-iot-rpi4:latest cat /root/.ssh/authorized_keys
+# If image is not written yet (Linux or macOS):
+podman run --rm localhost/fedora-iot-rpi4:latest cat /var/roothome/.ssh/authorized_keys
 ```
 
 ## 📚 Additional Resources
