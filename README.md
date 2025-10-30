@@ -2,15 +2,15 @@
 
 This project enables you to create a bootable Fedora IoT image for Raspberry Pi 4 using bootc technology and containers.
 
-## ✨ Features
+## Features
 
-- 🔧 **Automated build process** - Single command to create the entire image
-- 🐳 **Containerized approach** - Uses Podman for reproducible builds
-- 🔐 **SSH access** - Automatic SSH key injection for secure remote access
-- 🌐 **NetworkManager** - Full network configuration support
-- 🎯 **Optimized for RPi4** - Proper firmware, bootloader, and kernel
+- **Automated build process** - Single command to create the entire image
+- **Containerized approach** - Uses Podman for reproducible builds
+- **SSH access** - Automatic SSH key injection for secure remote access
+- **NetworkManager** - Full network configuration support
+- **Optimized for RPi4** - Proper firmware, bootloader, and kernel
 
-## 📋 Requirements
+## Requirements
 
 - **Fedora Linux** (recommended Fedora 40+) for full image building
 - **macOS** (Apple Silicon M1–M4) for container building only
@@ -39,7 +39,7 @@ podman machine start
   2. Use the `rootfs.tar` export and create the image manually on Linux
   3. Use a Linux VM (UTM, Parallels, VMware Fusion) with the full script
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Clone the project
 
@@ -104,7 +104,7 @@ sudo dd if=fedora-iot-rpi4-bootc.img of=/dev/rdiskN bs=4m && sync
 2. Connect power
 3. RPi4 will boot from the SD card
 
-## 🔐 SSH Access
+## SSH Access
 
 After boot, you can connect via SSH:
 
@@ -120,7 +120,7 @@ ssh root@<IP_ADDRESS>
 
 Your SSH key is automatically configured for both users.
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 .
@@ -129,7 +129,7 @@ Your SSH key is automatically configured for both users.
 └── README.md             # This documentation
 ```
 
-## 🔧 How It Works
+## How It Works
 
 ### 1. Containerfile
 
@@ -155,7 +155,7 @@ Defines the Fedora IoT bootc image:
 6. **Bootloader installation** - Copies RPi4 firmware and U-Boot
 7. **Cleanup** - Unmounts and cleans up temporary files
 
-## ⚙️ Advanced Configuration
+## Advanced Configuration
 
 ### Custom SSH key
 
@@ -183,7 +183,7 @@ dd if=/dev/zero of=${OUTPUT_IMAGE} bs=1M count=10240 status=progress
 
 Change `count=10240` (10GB) to your desired size in MB.
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Error: "Container does not exist"
 
@@ -230,13 +230,13 @@ Verify the key was properly injected:
 podman run --rm localhost/fedora-iot-rpi4:latest cat /var/roothome/.ssh/authorized_keys
 ```
 
-## 📚 Additional Resources
+## Additional Resources
 
 - [Fedora IoT Documentation](https://docs.fedoraproject.org/en-US/iot/)
 - [bootc Project](https://github.com/containers/bootc)
 - [Raspberry Pi 4 Documentation](https://www.raspberrypi.com/documentation/computers/raspberry-pi.html)
 
-## 📝 Notes
+## Notes
 
 - Image is optimized for Raspberry Pi 4 (Model B and 400)
 - Default image size is 10GB
@@ -244,14 +244,14 @@ podman run --rm localhost/fedora-iot-rpi4:latest cat /var/roothome/.ssh/authoriz
 - Supports EFI boot
 - NetworkManager is active for easy network configuration
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Create an issue or pull request.
 
-## 📄 License
+## License
 
 MIT License - free to use, modify, and distribute.
 
 ---
 
-Created with ❤️ for Fedora IoT and Raspberry Pi community
+Created for Fedora IoT and Raspberry Pi community
