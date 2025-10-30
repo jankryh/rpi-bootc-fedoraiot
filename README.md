@@ -32,12 +32,9 @@ podman machine start
 ```
 
 **Note for macOS users:** 
-- macOS can build the ARM64 bootc container image
-- **Disk image creation requires Linux** due to loop device limitations
-- Options for macOS users:
-  1. Build container on macOS, then create disk image on a Linux machine (VM, cloud, etc.)
-  2. Use the `rootfs.tar` export and create the image manually on Linux
-  3. Use a Linux VM (UTM, Parallels, VMware Fusion) with the full script
+- Full build process works directly on macOS (Apple Silicon M1–M4) using Podman machine
+- No Linux VM required - `build.sh` automatically runs Linux tools inside Podman machine's Linux VM
+- Simply run `./build.sh` (without sudo) and it will handle everything
 
 ## Quick Start
 

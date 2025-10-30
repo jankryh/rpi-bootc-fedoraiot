@@ -3,7 +3,6 @@
 ## Project Structure & Module Organization
 - `Containerfile` — Defines the Fedora IoT bootc image for Raspberry Pi 4 (aarch64).
 - `build.sh` — One-shot builder: builds the container, exports rootfs, creates the bootable `.img`.
-- `setup-vm.sh` — Optional helper to prepare a macOS UTM VM for Linux-only steps.
 - `README.md` — Usage and troubleshooting.
 - Generated artifacts (e.g., `fedora-iot-rpi4-bootc.img`, `rootfs.tar`) are ignored by `.gitignore`; do not commit them. Prefer placing outputs in `output/`.
 
@@ -11,8 +10,8 @@
 - Build container + disk image (Fedora Linux): `sudo ./build.sh`
 - Build via Podman machine (macOS M1–M4): `./build.sh`
 - Rebuild from scratch: `podman rmi localhost/fedora-iot-rpi4:latest && ./build.sh`
-- Lint shell scripts: `shellcheck build.sh setup-vm.sh`
-- Format shell scripts: `shfmt -w build.sh setup-vm.sh`
+- Lint shell scripts: `shellcheck build.sh`
+- Format shell scripts: `shfmt -w build.sh`
 - Validate Containerfile: `podman build --arch aarch64 -t localhost/fedora-iot-rpi4:dev -f Containerfile`
 
 ## Coding Style & Naming Conventions

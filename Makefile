@@ -56,7 +56,7 @@ lint:
 	@if [ -z "$(SHELLCHECK)" ]; then \
 	  echo "shellcheck not found. Install with: sudo dnf install -y ShellCheck | brew install shellcheck | sudo apt-get install -y shellcheck"; exit 1; \
 	else \
-	  "$(SHELLCHECK)" -S style build.sh setup-vm.sh; \
+	  "$(SHELLCHECK)" -S style build.sh; \
 	fi
 	@if [ -z "$(SHFMT)" ]; then \
 	  echo "shfmt not found. Install with: sudo dnf install -y shfmt | brew install shfmt | sudo apt-get install -y shfmt"; exit 1; \
@@ -68,7 +68,7 @@ format:
 	@if [ -z "$(SHFMT)" ]; then \
 	  echo "shfmt not found. Install with: sudo dnf install -y shfmt | brew install shfmt | sudo apt-get install -y shfmt"; exit 1; \
 	else \
-	  "$(SHFMT)" -w build.sh setup-vm.sh; \
+	  "$(SHFMT)" -w build.sh; \
 	fi
 
 tools:
