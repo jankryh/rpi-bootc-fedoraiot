@@ -62,6 +62,8 @@ On macOS (M1–M4):
 ./build.sh
 ```
 
+Note: Do not use sudo on macOS. Podman Machine is per-user and must run as your normal user. You can also use `make image`.
+
 The script automatically:
 1. Detects your SSH key (`~/.ssh/id_ed25519.pub` or `~/.ssh/id_rsa.pub`)
 2. Creates a bootc container with Fedora IoT for ARM64
@@ -198,6 +200,19 @@ Make sure you're using the correct device and have root access:
 
 ```bash
 sudo dd if=fedora-iot-rpi4-bootc.img of=/dev/sdX bs=4M status=progress && sync
+```
+
+### Error: "cannot run command \"podman machine start\" as root" on macOS
+
+Cause: The script was run with `sudo` on macOS. Podman Machine is per-user and cannot be controlled as root.
+
+Fix:
+
+```bash
+# On macOS, run without sudo
+./build.sh
+# or
+make image
 ```
 
 ### RPi4 doesn't boot

@@ -1,15 +1,8 @@
-FROM quay.io/fedora-bootc/fedora-bootc:latest
 # 🧩 Fedora IoT bootc image for Raspberry Pi 4
-# With automatic fallback to public Fedora bootc base
+FROM quay.io/fedora/fedora-bootc:42
 # ==========================================================
 ARG PUBKEY
-
-# Primary attempt: Fedora IoT bootc (if Quay.io allows)
-# If it fails, use the command below with public Fedora bootc image:
-#   sed -i '1s/.*/FROM quay.io\/fedora-bootc\/fedora-bootc:latest/' Containerfile
-
-#FROM quay.io/fedora-bootc/fedora-iot:latest
-FROM quay.io/fedora/fedora-bootc:42
+ARG SELINUX_MODE=permissive
 
 
 # If the above image is not accessible,
@@ -63,9 +56,12 @@ RUN echo "rpi4-bootc" > /etc/hostname && \
 # 🔐 SSH key for access (replace with your own)
 # ------------------------------------------------------
 # Insert SSH key into the correct location (bootc uses /var/roothome)
-RUN mkdir -p /var/roothome/.ssh && \
-    echo "${PUBKEY}" > /var/roothome/.ssh/authorized_keys && \
-    chmod 700 /var/roothome/.ssh && chmod 600 /var/roothome/.ssh/authorized_keys && \
+RUN mkdir -p /var/roothome && \
+    if [ -n "${PUBKEY}" ]; then \
+      mkdir -p /var/roothome/.ssh && \
+      echo "${PUBKEY}" > /var/roothome/.ssh/authorized_keys && \
+      chmod 700 /var/roothome/.ssh && chmod 600 /var/roothome/.ssh/authorized_keys; \
+    fi && \
     ln -sfn /var/roothome /root
 
 
@@ -83,7 +79,7 @@ RUN mkdir -p /boot/efi && \
 RUN systemctl enable systemd-journald && \
     mkdir -p /var/lib/bootc && \
     touch /etc/machine-id && \
-    echo "SELINUX=permissive" > /etc/selinux/config
+    echo "SELINUX=${SELINUX_MODE}" > /etc/selinux/config
 
 # ------------------------------------------------------
 # 🚀 Clean system ready for bootc deploy
