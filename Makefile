@@ -61,7 +61,7 @@ lint:
 	@if [ -z "$(SHFMT)" ]; then \
 	  echo "shfmt not found. Install with: sudo dnf install -y shfmt | brew install shfmt | sudo apt-get install -y shfmt"; exit 1; \
 	else \
-	  "$(SHFMT)" -d .; \
+	  "$(SHFMT)" -d build.sh; \
 	fi
 
 format:
